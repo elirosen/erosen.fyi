@@ -1,2 +1,3 @@
 # erosen.fyi
-my blog
+this is where I host my website
+push changes thru github
