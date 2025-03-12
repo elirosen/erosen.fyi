@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donor List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 20px;
+            margin-top: 10px;
+            color: #444;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .donor-section {
+            flex: 1;
+            margin: 10px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            font-size: 16px;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Purim 2025 Backers</h1>
+    
+    <div class="container">
+        <div class="donor-section">
+            <h2>Hosts 🏆 </h2>
+            <ul id="host-donors"></ul>
+        </div>
+
+        <div class="donor-section">
+            <h2>Sponsors 🥈 </h2>
+            <ul id="sponsor-donors"></ul>
+        </div>
+
+        <div class="donor-section">
+            <h2>Contributors 🥉  </h2>
+            <ul id="contributor-donors"></ul>
+        </div>
+    </div>
+
+    <script>
+        const sheetUrl = "https://script.google.com/macros/s/AKfycbzrKKKznpVqXyyuj6Wn3vsPSHnflg8MfqMHwzwTovPWNX_4umtpxcPSMEnbSjjK7Ryo/exec";
+
+        async function fetchDonorData() {
+            try {
+                const response = await fetch(sheetUrl);
+                const data = await response.json();
+                
+                // Clear all lists
+                document.getElementById("sponsor-donors").innerHTML = "";
+                document.getElementById("host-donors").innerHTML = "";
+                document.getElementById("contributor-donors").innerHTML = "";
+
+                // Sort donors into appropriate lists
+                data.forEach(entry => {
+                    const li = document.createElement("li");
+                    li.textContent = entry.name;
+                    
+                    switch(entry.level.toLowerCase()) {
+                        case "sponsor":
+                            document.getElementById("sponsor-donors").appendChild(li);
+                            break;
+                        case "host":
+                            document.getElementById("host-donors").appendChild(li);
+                            break;
+                        case "contributor":
+                            document.getElementById("contributor-donors").appendChild(li);
+                            break;
+                    }
+                });
+            } catch (error) {
+                console.error("Error fetching donor data:", error);
+            }
+        }
+
+        // Fetch data every 10 seconds
+        fetchDonorData();
+        setInterval(fetchDonorData, 10000);
+    </script>
+</body>
+</html>
