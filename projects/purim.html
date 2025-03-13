@@ -48,10 +48,26 @@
         li:last-child {
             border-bottom: none;
         }
+
+        /* Add media query for mobile devices */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 10px;
+                margin: 20px auto;
+            }
+            .container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .donor-section {
+                margin: 5px 0;
+            }
+        }
     </style>
 </head>
 <body>
     <h1>Purim 2025 Backers</h1>
+    <h3>Scan the QR code on the table to join</h3>
     
     <div class="container">
         <div class="donor-section">
