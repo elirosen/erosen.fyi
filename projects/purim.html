@@ -63,11 +63,23 @@
                 margin: 5px 0;
             }
         }
+        #celebrationGif {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            display: none;
+            max-width: 90vw;
+            max-height: 90vh;
+        }
     </style>
 </head>
 <body>
     <h1>Purim 2025 Backers</h1>
     <h3>Scan the QR code on the table to join</h3>
+    
+    <img id="celebrationGif" src="" alt="Celebration">
     
     <div class="container">
         <div class="donor-section">
@@ -88,12 +100,71 @@
 
     <script>
         const sheetUrl = "https://script.google.com/macros/s/AKfycbzrKKKznpVqXyyuj6Wn3vsPSHnflg8MfqMHwzwTovPWNX_4umtpxcPSMEnbSjjK7Ryo/exec";
+        let previousDonors = new Set();
+        
+        const celebrationGifs = [
+            'assets/celebrations/celebration1.gif',
+            'assets/celebrations/celebration2.gif',
+            'assets/celebrations/celebration3.gif',
+            'assets/celebrations/celebration4.gif',
+            'assets/celebrations/celebration5.gif',
+            'assets/celebrations/celebration6.gif',
+            'assets/celebrations/celebration7.gif',
+            'assets/celebrations/celebration8.gif',
+            'assets/celebrations/celebration9.gif',
+            'assets/celebrations/celebration10.gif'
+        ];
+
+        // Keep track of which GIFs are successfully loaded
+        const loadedGifs = new Set();
+
+        function preloadGifs() {
+            celebrationGifs.forEach(gifSrc => {
+                const img = new Image();
+                img.onload = () => loadedGifs.add(gifSrc);
+                img.onerror = () => console.warn(`Failed to load GIF: ${gifSrc}`);
+                img.src = gifSrc;
+            });
+        }
+
+        function getRandomGif() {
+            // Only select from successfully loaded GIFs
+            const availableGifs = celebrationGifs.filter(gif => loadedGifs.has(gif));
+            if (availableGifs.length === 0) {
+                console.warn('No GIFs available, falling back to default');
+                return 'assets/celebrations/default.gif';
+            }
+            const randomIndex = Math.floor(Math.random() * availableGifs.length);
+            return availableGifs[randomIndex];
+        }
+
+        function showCelebration() {
+            const gif = document.getElementById('celebrationGif');
+            gif.src = getRandomGif();
+            gif.style.display = 'block';
+            setTimeout(() => {
+                gif.style.display = 'none';
+            }, 3000);
+        }
+
+        // Initialize by preloading GIFs
+        preloadGifs();
 
         async function fetchDonorData() {
             try {
                 const response = await fetch(sheetUrl);
                 const data = await response.json();
                 
+                // Check for new donors
+                const currentDonors = new Set(data.map(entry => entry.name));
+                const newDonors = [...currentDonors].filter(donor => !previousDonors.has(donor));
+                
+                if (newDonors.length > 0) {
+                    showCelebration();
+                }
+                
+                previousDonors = currentDonors;
+
                 // Clear all lists
                 document.getElementById("sponsor-donors").innerHTML = "";
                 document.getElementById("host-donors").innerHTML = "";
